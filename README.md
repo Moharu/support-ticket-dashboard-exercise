@@ -85,6 +85,37 @@ feedback. They also verify that a ticket hidden by an optimistic status change
 returns with its error after rollback. Queries use labels, headings, and button
 names rather than CSS classes. These tests check behavior, not visual layout.
 
+## Conclusions and tradeoffs
+
+This was primarily a React, asynchronous state management, and testing exercise
+hosted inside Next.js. It used App Router routes and the server/client component
+boundary, but the dashboard's data flow runs in the browser. The mock client API
+left little reason to explore server-side data fetching, caching, or backend route
+handlers as part of the ticket implementation.
+
+Redux Toolkit made optimistic updates, per-ticket request tracking, rollback, and
+testing explicit. However, the store, provider, typed hooks, slices, selectors, and
+thunks introduced substantial structure for a small dashboard. The remaining
+starter examples also made the project noisier to navigate.
+
+Redux was a useful learning choice, rather than a requirement imposed by this
+scope. Local state with `useReducer` could handle these interactions; a query
+library would be another option for managing data fetched from a real API. The
+choice should reflect how widely state is shared and how the application is
+expected to grow.
+
+## Possible follow-ups
+
+- Rebuild the same dashboard with `useReducer`, preserving the behavior and test
+  cases, then compare navigation, code volume, and ownership of async logic.
+- Build a separate Next.js exercise around server-fetched data, persistence, and
+  server-side mutations. Explore loading/error boundaries and cache revalidation
+  so the framework plays a more substantial role.
+- Connect the dashboard to a real API and compare explicit thunk lifecycles with
+  a query library's fetching, mutation, and optimistic-update model.
+- Remove the unused counter and quotes examples to make the ticket feature easier
+  to navigate.
+
 ## Validation
 
 ```bash
