@@ -128,6 +128,7 @@ Test files:
 - `lib/features/tickets/ticketsSlice.test.ts`: selector and async Redux behavior.
 - `app/components/tickets/Tickets.test.tsx`: component interactions with Redux.
 
-The dashboard was implemented through coached checkpoints; test implementation
-was delegated to the assistant and reviewed through explanations of the cases
-and assertions.
+The dashboard was implemented through coached checkpoints. The initial selector,
+thunk, and component tests were implemented by the assistant, with explanations
+of the test cases and assertions. The subsequent priority-filter coverage was
+written by the project author, with assistant review and feedback.
