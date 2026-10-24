@@ -8,5 +8,6 @@ export type Ticket = {
 export type UiTicket = {
   ticket: Ticket;
   saveStatus: 'idle' | 'pending' | 'succeeded' |'failed';
+  previousStatus: TicketStatus | null;
   saveError: string | null;
 }

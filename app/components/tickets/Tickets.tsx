@@ -1,11 +1,26 @@
 "use client";
-import { fetchTickets, selectTickets, selectFetchStatus, selectErrorMessage } from "@/lib/features/tickets/ticketsSlice";
+import { 
+  fetchTickets,
+  updateTicketStatus,
+  selectNumberOfTickets,
+  selectVisibleTickets,
+  selectTitleSearch,
+  selectStatusFilter,
+  selectFetchStatus,
+  selectErrorMessage,
+  setStatusFilter,
+  setTitleSearch
+} from "@/lib/features/tickets/ticketsSlice";
+import TicketList from "./TicketList";
 import { useEffect } from "react";
 import { useAppDispatch, useAppSelector } from "@/lib/hooks";
 import styles from "./Tickets.module.css";
 
 export const Tickets = () => {
-  const ticketList = useAppSelector(selectTickets);
+  const ticketList = useAppSelector(selectVisibleTickets);
+  const numberOfTickets = useAppSelector(selectNumberOfTickets);
+  const statusFilter = useAppSelector(selectStatusFilter);
+  const titleSearch = useAppSelector(selectTitleSearch);
   const fetchStatus = useAppSelector(selectFetchStatus);
   const errorMessage = useAppSelector(selectErrorMessage);
 
@@ -14,13 +29,10 @@ export const Tickets = () => {
   const isError = fetchStatus === "failed";
 
   const dispatch = useAppDispatch();
-  const handleFetchTickets = () => { 
-    dispatch(fetchTickets());
-  }
 
   useEffect(() => {
     if(fetchStatus === "idle") {
-      handleFetchTickets();
+      dispatch(fetchTickets());
     }
   }, [dispatch, fetchStatus]);
 
@@ -28,7 +40,7 @@ export const Tickets = () => {
     return (
       <div>
         <h1>{errorMessage}</h1>
-        <button onClick={handleFetchTickets}>Retry</button>
+        <button onClick={() => dispatch(fetchTickets())}>Retry</button>
       </div>
     );
   }
@@ -41,33 +53,49 @@ export const Tickets = () => {
     );
   }
 
-  if (ticketList.length === 0) {
-    return (
-      <div>
-        <h1>No tickets found.</h1>
-        <button onClick={handleFetchTickets}>Retry</button>
-      </div>
-    );
-  }
-
+  
   if (isSuccess) {
+    if (numberOfTickets === 0) {
+      return (
+        <div>
+          <h1>No tickets found.</h1>
+        </div>
+      );
+    }
+
     return (
       <div className={styles.container}>
-        {ticketList.map((ticketItem) => {
-          const { ticket, saveStatus, saveError } = ticketItem;
-          const { id, title, description, status } = ticket;
-          return (
-            <div key={id} className={styles.ticketCard}>
-              <h2>{title}</h2>
-              <p>{description}</p>
-              <p>Status: {status}</p>
-              {saveStatus === "pending" && <p>Saving...</p>}
-              {saveStatus === "failed" && (
-                <p className={styles.error}>Error: {saveError}</p>
-              )}
-            </div>
-          );
-        })}
+        <div>
+          <label htmlFor="statusFilter">Filter by status:</label>
+          <select
+            id="statusFilter"
+            value={statusFilter}
+            onChange={(e) => {
+              const selectedStatus = e.target.value as "all" | "open" | "closed";
+              dispatch(setStatusFilter(selectedStatus));
+            }}
+          >
+            <option value="all">All</option>
+            <option value="open">Open</option>
+            <option value="closed">Closed</option>
+          </select>
+          <label htmlFor="titleSearch">Search by title:</label>
+          <input
+            id="titleSearch"
+            type="text"
+            placeholder="Enter ticket title..."
+            value={titleSearch}
+            onChange={(e) => {
+              const searchTerm = e.target.value;
+              dispatch(setTitleSearch(searchTerm));
+            }}
+          />
+        </div>
+        {ticketList.length === 0 ? <p>No tickets match the current filters.</p> : 
+          <TicketList ticketList={ticketList} onChangeStatus={(id, newStatus) => {
+            dispatch(updateTicketStatus({ id, newStatus }));
+          }} />
+        }
       </div>
     );
   }
