@@ -1,10 +1,11 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { editTicketStatus, fetchTicketList } from "@/lib/mockApi";
 import { makeStore } from "@/lib/store";
-import type { Ticket, TicketStatus } from "./types";
+import type { Ticket, TicketPriority, TicketStatus } from "./types";
 import {
   fetchTickets,
   selectVisibleTickets,
+  setPriorityFilter,
   setStatusFilter,
   setTitleSearch,
   updateTicketStatus,
@@ -47,19 +48,26 @@ beforeEach(() => {
 
 describe("ticket filtering", () => {
   it.each([
-    ["all", "", [1, 2, 3]],
-    ["open", "", [1, 3]],
-    ["closed", "", [2]],
-    ["all", "  LOGIN  ", [1, 2]],
-    ["open", "login", [1]],
-    ["closed", "billing", []],
-    ["all", "unknown", []],
-  ] satisfies ["all" | TicketStatus, string, number[]][])(
-    "filters status=%s and search=%s",
-    async (status, search, expectedIds) => {
+    ["all", "", "all", [1, 2, 3]],
+    ["open", "", "all", [1, 3]],
+    ["closed", "", "all", [2]],
+    ["all", "  LOGIN  ", "all", [1, 2]],
+    ["open", "login", "all", [1]],
+    ["closed", "billing", "all", []],
+    ["all", "unknown", "all", []],
+    ["all", "", "low", [1]],
+    ["all", "", "medium", [2]],
+    ["all", "", "high", [3]],
+    ["closed", "", "medium", [2]],
+    ["closed", "", "high", []],
+    ["open", "login", "high", []],
+  ] satisfies ["all" | TicketStatus, string, "all" | TicketPriority, number[]][])(
+    "filters status=%s and search=%s and priority=%s",
+    async (status, search, priority, expectedIds) => {
       const store = await loadedStore();
       store.dispatch(setStatusFilter(status));
       store.dispatch(setTitleSearch(search));
+      store.dispatch(setPriorityFilter(priority));
       expect(selectVisibleTickets(store.getState()).map(({ ticket }) => ticket.id))
         .toEqual(expectedIds);
     },

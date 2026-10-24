@@ -89,8 +89,10 @@ describe("Tickets", () => {
     await screen.findByRole("heading", { name: "Login problem" });
     const search = screen.getByRole("textbox", { name: "Search by title:" });
     const status = screen.getByRole("combobox", { name: "Filter by status:" });
+    const priority = screen.getByRole("combobox", { name: "Filter by priority:" });
     await user.type(search, "  LOGIN  ");
     await user.selectOptions(status, "closed");
+    await user.selectOptions(priority, "medium")
     expect(screen.getAllByRole("heading", { level: 2 })).toHaveLength(1);
     expect(screen.getByRole("heading", { name: "Login timeout" })).toBeInTheDocument();
     await user.clear(search);
@@ -99,7 +101,25 @@ describe("Tickets", () => {
     expect(screen.queryByText("No tickets found.")).not.toBeInTheDocument();
     await user.clear(search);
     await user.selectOptions(status, "all");
+    await user.selectOptions(priority, "all");
     expect(screen.getAllByRole("heading", { level: 2 })).toHaveLength(3);
+  });
+
+  it("correctly filters by priority", async () => {
+    const user = userEvent.setup();
+    renderTickets();
+    await screen.findByRole("heading", { name: "Billing question" });
+    const search = screen.getByRole("textbox", { name: "Search by title:" });
+    const status = screen.getByRole("combobox", { name: "Filter by status:" });
+    const priority = screen.getByRole("combobox", { name: "Filter by priority:" });
+    await user.clear(search);
+    await user.selectOptions(status, "all");
+    await user.selectOptions(priority, "high");
+    expect(screen.getAllByRole("heading", { level: 2 })).toHaveLength(1);
+    expect(screen.getByRole("heading", { name: "Billing question" })).toBeInTheDocument();
+    await user.selectOptions(priority, "low");
+    expect(screen.getAllByRole("heading", { level: 2 })).toHaveLength(1);
+    expect(screen.getByRole("heading", { name: "Login problem" })).toBeInTheDocument();
   });
 
   it("restores filter controls and results when remounted with the same store", async () => {
@@ -108,10 +128,12 @@ describe("Tickets", () => {
     const view = renderTickets(store);
     await screen.findByRole("heading", { name: "Login problem" });
     await user.selectOptions(screen.getByLabelText("Filter by status:"), "closed");
+    await user.selectOptions(screen.getByLabelText("Filter by priority:"), "medium");
     await user.type(screen.getByLabelText("Search by title:"), "timeout");
     view.unmount();
     renderTickets(store);
     expect(screen.getByLabelText("Filter by status:")).toHaveValue("closed");
+    expect(screen.getByLabelText("Filter by priority:")).toHaveValue("medium");
     expect(screen.getByLabelText("Search by title:")).toHaveValue("timeout");
     expect(screen.getAllByRole("heading", { level: 2 })).toHaveLength(1);
     expect(screen.getByRole("heading", { name: "Login timeout" })).toBeInTheDocument();
