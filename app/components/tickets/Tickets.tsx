@@ -9,7 +9,9 @@ import {
   selectFetchStatus,
   selectErrorMessage,
   setStatusFilter,
-  setTitleSearch
+  setPriorityFilter,
+  setTitleSearch,
+  selectPriorityFilter
 } from "@/lib/features/tickets/ticketsSlice";
 import TicketList from "./TicketList";
 import { useEffect } from "react";
@@ -20,6 +22,7 @@ export const Tickets = () => {
   const ticketList = useAppSelector(selectVisibleTickets);
   const numberOfTickets = useAppSelector(selectNumberOfTickets);
   const statusFilter = useAppSelector(selectStatusFilter);
+  const priorityFilter = useAppSelector(selectPriorityFilter)
   const titleSearch = useAppSelector(selectTitleSearch);
   const fetchStatus = useAppSelector(selectFetchStatus);
   const errorMessage = useAppSelector(selectErrorMessage);
@@ -78,6 +81,20 @@ export const Tickets = () => {
             <option value="all">All</option>
             <option value="open">Open</option>
             <option value="closed">Closed</option>
+          </select>
+          <label htmlFor="priorityFilter">Filter by priority:</label>
+          <select
+            id="priorityFilter"
+            value={priorityFilter}
+            onChange={(e) => {
+              const selectedPriority = e.target.value as "all" | "low" | "medium" | "high";
+              dispatch(setPriorityFilter(selectedPriority));
+            }}
+          >
+            <option value="all">All</option>
+            <option value="low">Low</option>
+            <option value="medium">Medium</option>
+            <option value="high">High</option>
           </select>
           <label htmlFor="titleSearch">Search by title:</label>
           <input

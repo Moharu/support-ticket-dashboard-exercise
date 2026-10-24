@@ -16,9 +16,9 @@ vi.mock("@/lib/mockApi", () => ({
 }));
 
 const fixtures: Ticket[] = [
-  { id: 1, title: "Login problem", description: "Account access", status: "open" },
-  { id: 2, title: "Login timeout", description: "Connection issue", status: "closed" },
-  { id: 3, title: "Billing question", description: "Invoice issue", status: "open" },
+  { id: 1, title: "Login problem", description: "Account access", status: "open", priority: 'low' },
+  { id: 2, title: "Login timeout", description: "Connection issue", status: "closed", priority: 'medium' },
+  { id: 3, title: "Billing question", description: "Login mentioned only here", status: "open", priority: 'high' },
 ];
 
 function deferred<T>() {

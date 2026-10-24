@@ -15,7 +15,7 @@ npm run dev
 ```
 
 Open [http://localhost:3000/tickets](http://localhost:3000/tickets).
-The original counter and quotes examples remain in the repository.
+The home route redirects to `/tickets`. The unused starter demos have been removed.
 
 ## Features
 
@@ -95,7 +95,7 @@ handlers as part of the ticket implementation.
 
 Redux Toolkit made optimistic updates, per-ticket request tracking, rollback, and
 testing explicit. However, the store, provider, typed hooks, slices, selectors, and
-thunks introduced substantial structure for a small dashboard. The remaining
+thunks introduced substantial structure for a small dashboard. Before cleanup, the
 starter examples also made the project noisier to navigate.
 
 Redux was a useful learning choice, rather than a requirement imposed by this
@@ -113,8 +113,6 @@ expected to grow.
   so the framework plays a more substantial role.
 - Connect the dashboard to a real API and compare explicit thunk lifecycles with
   a query library's fetching, mutation, and optimistic-update model.
-- Remove the unused counter and quotes examples to make the ticket feature easier
-  to navigate.
 
 ## Validation
 

@@ -1,13 +1,14 @@
 import { createAppSlice } from "@/lib/createAppSlice";
 import { fetchTicketList, editTicketStatus } from "../../mockApi";
 import { createSelector } from "@reduxjs/toolkit";
-import type { TicketStatus, UiTicket } from "./types";
+import type { TicketPriority, TicketStatus, UiTicket } from "./types";
 import type { PayloadAction } from "@reduxjs/toolkit";
 import type { RootState } from "@/lib/store";
 
 export type TicketsSliceState = {
   tickets: UiTicket[];
   statusFilter: "all" | TicketStatus;
+  priorityFilter: "all" | TicketPriority;
   titleSearch: string;
   fetchStatus: "idle" | "pending" | "succeeded" | "failed";
   errorMessage: string | null;
@@ -16,6 +17,7 @@ export type TicketsSliceState = {
 const initialState: TicketsSliceState = {
   tickets: [],
   statusFilter: 'all',
+  priorityFilter: 'all',
   titleSearch: '',
   fetchStatus: "idle",
   errorMessage: null,
@@ -31,6 +33,9 @@ export const ticketsSlice = createAppSlice({
     }),
     setTitleSearch: create.reducer((state, action: PayloadAction<string>) => {
       state.titleSearch = action.payload;
+    }),
+    setPriorityFilter: create.reducer((state, action: PayloadAction<"all" | TicketPriority>) => {
+      state.priorityFilter = action.payload;
     }),
     fetchTickets: create.asyncThunk(
       () => fetchTicketList(),{
@@ -110,28 +115,32 @@ export const ticketsSlice = createAppSlice({
       [
         (state: TicketsSliceState) => state.tickets,
         (state: TicketsSliceState) => state.statusFilter,
+        (state: TicketsSliceState) => state.priorityFilter,
         (state: TicketsSliceState) => state.titleSearch
       ],
-      (tickets, statusFilter, titleSearch) => {
+      (tickets, statusFilter, priorityFilter, titleSearch) => {
         const search = titleSearch.toLowerCase().trim();
-        return tickets.filter(({ ticket: { status, title } }) => {
+        return tickets.filter(({ ticket: { status, title, priority } }) => {
           const matchesStatus =
             statusFilter === "all" || status === statusFilter;
+          const matchesPriority =
+            priorityFilter === "all" || priority === priorityFilter;
           const matchesTitle = title
             .toLowerCase()
             .includes(search);
-          return matchesStatus && matchesTitle;
+          return matchesStatus && matchesTitle && matchesPriority;
         });
       }
     ),
     selectTitleSearch: (state) => state.titleSearch,
     selectStatusFilter: (state) => state.statusFilter,
+    selectPriorityFilter: (state) => state.priorityFilter,
     selectFetchStatus: (state) => state.fetchStatus,
     selectErrorMessage: (state) => state.errorMessage,
   },
 });
 
-export const { fetchTickets, updateTicketStatus, setStatusFilter, setTitleSearch } =
+export const { fetchTickets, updateTicketStatus, setStatusFilter, setPriorityFilter, setTitleSearch } =
   ticketsSlice.actions;
 
 export const { 
@@ -140,5 +149,6 @@ export const {
   selectErrorMessage,
   selectVisibleTickets,
   selectTitleSearch,
+  selectPriorityFilter,
   selectStatusFilter
 } = ticketsSlice.selectors;

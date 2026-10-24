@@ -5,11 +5,12 @@ export default function TicketList({ ticketList, onChangeStatus }: { ticketList:
   return <div>
     {ticketList.map((ticketItem) => {
           const { ticket, saveStatus, saveError } = ticketItem;
-          const { id, title, description, status } = ticket;
+          const { id, title, description, priority, status } = ticket;
           return (
             <div key={id} className={styles.ticketCard}>
               <h2>{title}</h2>
               <p>{description}</p>
+              <p>Priority: {priority}</p>
               <p>Status: {status}</p>
               {saveStatus === "pending" && <p>Saving...</p>}
               {saveStatus === "failed" && (
